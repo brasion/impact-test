@@ -13,6 +13,32 @@ public class RangeSummarizer implements NumberRangeSummarizer {
   public Collection<Integer> collect(String input) {
     ArrayList<Integer> numberSequence = new ArrayList<>();
 
+    String buffer = "";
+    for (int pos = 0; pos < input.length(); pos++) {
+      Character ch = input.charAt(pos);
+      switch (ch) {
+        case '-':
+          if (buffer == "") {
+            buffer += ch;
+          }
+          break;
+        case '0','1','2','3','4','5','6','7','8','9':
+          buffer += ch;
+          break;
+        case ',':
+          if (buffer != "") {
+            numberSequence.add(Integer.valueOf(buffer));
+          }
+          buffer = "";
+          break;
+        default:
+          break;
+      }
+    }
+    // Add last section of buffer to sequence
+    if (buffer != "") {
+      numberSequence.add(Integer.valueOf(buffer));
+    }
     return numberSequence;
   }
 
