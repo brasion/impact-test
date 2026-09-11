@@ -1,2 +1,7 @@
 # Impact Coding Test
-## Sorting a set of numbers
+
+## Grouping a set of input numbers
+
+## Assumption and dependency list
+- I have used maven ___ to run my unit tests
+- I have used java ___
