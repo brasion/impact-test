@@ -42,47 +42,49 @@ public class RangeSummarizer implements NumberRangeSummarizer {
     return numberSequence;
   }
 
+  /**
+   * Summarizes a collection into a set of ranges
+   * XXX define a range as strictly 3 consecutive numbers
+   * 
+   * @param input the input collection to be summarized
+   */
   @Override
   public String summarizeCollection(Collection<Integer> input) {
     String s = "";
+    // prev == null denotes the first iteration
     Integer prev = null;
     Integer curr = null;
-    // Sanity check for empty list
-    if (input.size() == 0) {
-      return s;
-    }
-    // TODO Sort the input collection
+    Boolean isRange = false;
+
     Iterator<Integer> elements = input.iterator();
-    // If empty no error :)
-    if (elements.hasNext()) {
-      curr = elements.next();
-      s += String.valueOf(curr);
-      prev = curr;
-    }
-    Boolean range = false;
+
     while (elements.hasNext()) {
+      // Get next element
       curr = elements.next();
-      if (curr == prev + 1) {
-        range = true;
-      }
-      while (elements.hasNext() && curr == prev + 1) {
-        range = true;
+      // Unecessarily complex
+      while (elements.hasNext() && prev != null &&  curr == prev + 1) {
+        isRange = true;
         prev = curr;
         curr = elements.next();
       }
-      if (range) {
+      if (isRange) {
+        // if there is no next, end the range right here
         if (!elements.hasNext()) {
           s += "-" + String.valueOf(curr);
         } else {
-          s += "-" + String.valueOf(prev) + "," + String.valueOf(curr);
+          // end the range at the previous value, write current element
+          s += "-" + String.valueOf(prev) + ", " + String.valueOf(curr);
         }
       } else {
-        s += "," + String.valueOf(curr);
+        // Do not add comma on first iteration
+        if (prev != null) {
+          s += ", ";
+        }
+        s += String.valueOf(curr);
       }
-      range = false;
+      isRange = false;
       prev = curr;
     }
-
     return s;
   }
 }

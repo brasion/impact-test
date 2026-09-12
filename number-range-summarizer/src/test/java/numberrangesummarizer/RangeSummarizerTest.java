@@ -174,7 +174,62 @@ public class RangeSummarizerTest {
     public void shouldHaveCorrectString() {
         ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(1, 2, 4, 6, 8, 9, 12, 14, 18, 20, 21, 22));
         String s = rs.summarizeCollection(arr);
-        assertEquals("1-2,4,6,8-9,12,14,18,20-22", s);
+        assertEquals("1-2, 4, 6, 8-9, 12, 14, 18, 20-22", s);
     }
+
+    /**
+     * An empty array should return the empty string
+     */
+    @Test
+    public void shouldReturnEmptyString() {
+        ArrayList<Integer> arr = new ArrayList<>();
+        String s = rs.summarizeCollection(arr);
+        assertEquals("", s);
+    }
+
+    /**
+     * Functions correctly with a single elemebt
+     */
+    @Test
+    public void shouldReturnSingleNumber() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(1));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("1", s);
+    }
+    
+    /**
+     * Functions correctly with a complete range
+     */
+    @Test
+    public void shouldReturnSingleRange() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(1,2,3,4,5,6,7,8,9,10));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("1-10", s);
+    }
+
+    /**
+     * Functions correctly with negative ranges
+     */
+    @Test
+    public void shouldReturnNegativeString() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(0, -1, -2, -3, -4, 4));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("0, -1, -2, -3, -4, 4", s);
+
+        arr = new ArrayList<>(Arrays.asList(-4, -3, -2, -1));
+        s = rs.summarizeCollection(arr);
+        assertEquals("-4--1", s);
+    }
+
+    /**
+     * Should still detect ranges when string is out of order
+     */
+    @Test
+    public void shouldReturnSequencesString() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(25,4,5,6,23,3,-5,-6,-7,10));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("25, 4-6, 23, 3, -5, -6, -7, 10", s);
+    }
+
 
 }
