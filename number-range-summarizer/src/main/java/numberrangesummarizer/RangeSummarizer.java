@@ -18,7 +18,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
       Character ch = input.charAt(pos);
       switch (ch) {
         case '-':
-          if (buffer == "") {
+          if (buffer.equals("")) {
             buffer += ch;
           }
           break;
@@ -26,7 +26,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
           buffer += ch;
           break;
         case ',':
-          if (buffer != "") {
+          if (buffer != "" && buffer != "-") {
             numberSequence.add(Integer.valueOf(buffer));
           }
           buffer = "";
@@ -36,7 +36,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
       }
     }
     // Add last section of buffer to sequence
-    if (buffer != "") {
+    if (!buffer.equals("") && !buffer.equals("-")) {
       numberSequence.add(Integer.valueOf(buffer));
     }
     return numberSequence;

@@ -23,10 +23,149 @@ public class RangeSummarizerTest {
     public void parseOrderedString() {
       String s = "0,1,2,3,4,5,6";
       ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(7, arr.size());
       for (int i =0; i < arr.size(); i++) {
         assertEquals(i, arr.get(i));
       }
     }
+
+    /**
+     * Should return an empty list when the string is empty
+     */
+    @Test
+    public void parseEmpty() {
+      String s = "";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+    }
+
+    /**
+     * Should parse a list of negative integers correctly
+     */
+    @Test
+    public void parseNegative() {
+      String s = "-4,-3,-2,-1";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(4, arr.size());
+      for (int i =0; i < arr.size(); i++) {
+        assertEquals((i-4), arr.get(i));
+      }
+    }
+
+    /**
+     * Should ignore the leading 0 in numbers
+     */
+    @Test
+    public void parseLeadingZero() {
+      String s = "-001, 0000, 001,02,003,";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(5, arr.size());
+      for (int i = 0 ; i < arr.size(); i++) {
+        assertEquals((i-1), arr.get(i));
+      }
+    }
+
+    /**
+     * Should ignore non-numeric characters
+     */
+    @Test
+    public void parseNonNumeric() {
+      String s = "1a,2b,3,al4bet";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(4, arr.size());
+      for (int i =0; i < arr.size(); i++) {
+        assertEquals((i+1), arr.get(i));
+      }
+    }
+
+    /**
+     * Should ignore incorrectly placed negative signs
+     * 
+     * Note it does not do arithmetic
+     */
+    @Test
+    public void parseNegativeSign() {
+      String s = "--1,2-,3-4,2-3-4";
+      ArrayList<Integer> expected = new ArrayList<>(Arrays.asList(-1, 2, 34, 234));
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(4, arr.size());
+      for (int i =0; i < arr.size(); i++) {
+        assertEquals(expected.get(i), arr.get(i));
+      }
+    }
+
+    /**
+     * If a negative sign is followed by no numbers, it should also be ignored
+     */
+    @Test
+    public void parseOnlyNegative() {
+      String s = "-";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+    }
+
+    /**
+     * A single number should parse correctly
+     */
+    @Test
+    public void parseOnlyNumber() {
+      String s = "20";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(1, arr.size());
+      assertEquals(20, arr.get(0));
+    }
+
+    /**
+     * A single number should parse correctly
+     */
+    @Test
+    public void parseOnlyNegativeNumber() {
+      String s = "-20";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(1, arr.size());
+      assertEquals(-20, arr.get(0));
+    }
+
+    /**
+     * Should ignore commas with nothing or only numbers between them
+     * 
+     * For this test we combine a few different ways that we could get nothing
+     */
+    @Test
+    public void parseEmptySections() {
+      String s = ",";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+
+      s = ",,";
+      arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+
+      s = "wait, this is, a sentence, not a sequence";
+      arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+    }
+
+    /**
+     * Should unicode as it does other character, especiall when that unicode is a number
+     */
+    @Test
+    public void parseUnicode() {
+      String s = "\u0021";
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(0, arr.size());
+
+      s = "\u1200,\u0030,";
+      arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(1, arr.size());
+      assertEquals(0, arr.get(0));
+
+      s = "\u4785\u3902,\u0031\u0033";
+      arr = (ArrayList<Integer>) rs.collect(s);
+      assertEquals(1, arr.size());
+      assertEquals(13, arr.get(0));
+    }
+  
 
     /**
      * Test a set of conventional string
