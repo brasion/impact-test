@@ -54,37 +54,46 @@ public class RangeSummarizer implements NumberRangeSummarizer {
     // prev == null denotes the first iteration
     Integer prev = null;
     Integer curr = null;
+    Boolean couldBeRange = false;
     Boolean isRange = false;
-
+    
     Iterator<Integer> elements = input.iterator();
 
-    while (elements.hasNext()) {
-      // Get next element
+    if (elements.hasNext()) {
       curr = elements.next();
-      // Unecessarily complex
-      while (elements.hasNext() && prev != null &&  curr == prev + 1) {
-        isRange = true;
-        prev = curr;
-        curr = elements.next();
-      }
-      if (isRange) {
-        // if there is no next, end the range right here
-        if (!elements.hasNext()) {
-          s += "-" + String.valueOf(curr);
-        } else {
-          // end the range at the previous value, write current element
-          s += "-" + String.valueOf(prev) + ", " + String.valueOf(curr);
-        }
-      } else {
-        // Do not add comma on first iteration
-        if (prev != null) {
-          s += ", ";
-        }
-        s += String.valueOf(curr);
-      }
-      isRange = false;
+      s += String.valueOf(curr);
       prev = curr;
     }
+
+    while (elements.hasNext()) {
+      curr = elements.next();
+      if (curr == prev + 1) {
+        if (couldBeRange) {
+          isRange = true;
+        } else {
+          couldBeRange = true;
+        }
+      } else {
+        if (isRange) {
+          s += "-" + String.valueOf(prev);
+          isRange = false;
+          couldBeRange = false;
+        } else if (couldBeRange) {
+          s += ", " + String.valueOf(prev);
+          couldBeRange = false;
+        }
+        s += ", " + String.valueOf(curr);
+      }
+      prev = curr;
+    }
+
+    // If array terminated before range status could be determined, add last range element
+    if (isRange) {
+      s += "-" + String.valueOf(curr);
+    } else if (couldBeRange) {
+      s += ", " + String.valueOf(curr);
+    }
+
     return s;
   }
 }

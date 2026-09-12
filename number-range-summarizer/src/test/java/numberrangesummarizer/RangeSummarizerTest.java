@@ -165,17 +165,6 @@ public class RangeSummarizerTest {
       assertEquals(1, arr.size());
       assertEquals(13, arr.get(0));
     }
-  
-
-    /**
-     * Test a set of conventional string
-     */
-    @Test
-    public void shouldHaveCorrectString() {
-        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(1, 2, 4, 6, 8, 9, 12, 14, 18, 20, 21, 22));
-        String s = rs.summarizeCollection(arr);
-        assertEquals("1-2, 4, 6, 8-9, 12, 14, 18, 20-22", s);
-    }
 
     /**
      * An empty array should return the empty string
@@ -219,6 +208,22 @@ public class RangeSummarizerTest {
         arr = new ArrayList<>(Arrays.asList(-4, -3, -2, -1));
         s = rs.summarizeCollection(arr);
         assertEquals("-4--1", s);
+    }
+
+
+    /**
+     * Two consecutive numbers should not be grouped into a range. Test that this works
+     * when its in the beginning, middle, end, or isolated secion of the strin.
+     */
+    @Test
+    public void shouldNotSequenceTwoConsecutiveNumbers() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(-2,-1, 1, 2, 4, 6, 8, 9));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("-2, -1, 1, 2, 4, 6, 8, 9", s);
+
+        arr = new ArrayList<>(Arrays.asList(1, 2));
+        s = rs.summarizeCollection(arr);
+        assertEquals("1, 2", s);
     }
 
     /**
