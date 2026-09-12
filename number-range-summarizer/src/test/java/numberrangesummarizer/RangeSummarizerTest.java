@@ -1,23 +1,29 @@
 package numberrangesummarizer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-// import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit test for simple App.
+ * Unit tests for RangeSummarazer implementation.
  */
 public class RangeSummarizerTest {
 
-    // rs has no internal state, so no reason to initialise it every time
+    /**
+     * The RangeSummarize object has no internal state, so create static instance since there
+     * is no need to create and teardown every test.
+     */
     private static RangeSummarizer rs = new RangeSummarizer();
 
     /**
-     * Parses a basic string correctly
+     * It should parse a ordinary string correctly
      */
     @Test
     public void parseOrderedString() {
@@ -30,7 +36,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should return an empty list when the string is empty
+     * It should return an empty list when the string is empty
      */
     @Test
     public void parseEmpty() {
@@ -40,7 +46,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should parse a list of negative integers correctly
+     * It should parse a list of negative integers correctly
      */
     @Test
     public void parseNegative() {
@@ -53,7 +59,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should ignore the leading 0 in numbers
+     * It should ignore the leading 0 in numbers
      */
     @Test
     public void parseLeadingZero() {
@@ -66,7 +72,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should ignore non-numeric characters
+     * It should ignore non-numeric characters
      */
     @Test
     public void parseNonNumeric() {
@@ -79,9 +85,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should ignore incorrectly placed negative signs
-     * 
-     * Note it does not do arithmetic
+     * It should ignore incorrectly placed negative signs
      */
     @Test
     public void parseNegativeSign() {
@@ -95,7 +99,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * If a negative sign is followed by no numbers, it should also be ignored
+     * If a negative sign is followed by no numbers it should also be ignored
      */
     @Test
     public void parseOnlyNegative() {
@@ -116,7 +120,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * A single number should parse correctly
+     * A single negative number should parse correctly
      */
     @Test
     public void parseOnlyNegativeNumber() {
@@ -127,9 +131,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should ignore commas with nothing or only numbers between them
-     * 
-     * For this test we combine a few different ways that we could get nothing
+     * It should ignore commas with nothing or only non-numeric values between them
      */
     @Test
     public void parseEmptySections() {
@@ -147,7 +149,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should unicode as it does other character, especiall when that unicode is a number
+     * It should parse unicode as it does other character, especially when that unicode is a number
      */
     @Test
     public void parseUnicode() {
@@ -167,7 +169,16 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * An empty array should return the empty string
+     * It should return an empty array when the integer is null
+     */
+    @Test
+    public void collectNullShouldBeEmpty() {
+      ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(null);
+      assertEquals(0, arr.size());
+    }
+
+    /**
+     * It should return an empty array when the string is empty
      */
     @Test
     public void shouldReturnEmptyString() {
@@ -177,7 +188,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Functions correctly with a single elemebt
+     * It should convert a single element to a string correctly
      */
     @Test
     public void shouldReturnSingleNumber() {
@@ -210,7 +221,6 @@ public class RangeSummarizerTest {
         assertEquals("-4--1", s);
     }
 
-
     /**
      * Two consecutive numbers should not be grouped into a range. Test that this works
      * when its in the beginning, middle, end, or isolated secion of the strin.
@@ -227,7 +237,7 @@ public class RangeSummarizerTest {
     }
 
     /**
-     * Should still detect ranges when string is out of order
+     * It should still detect ranges when string is out of order
      */
     @Test
     public void shouldReturnSequencesString() {
@@ -236,5 +246,28 @@ public class RangeSummarizerTest {
         assertEquals("25, 4-6, 23, 3, -5, -6, -7, 10", s);
     }
 
+    /**
+     * It should work with any collection
+     */
+    @Test
+    public void shouldReturnSequencesForAnyCollection() {
+        LinkedList<Integer> ll = new LinkedList<>(Arrays.asList(25,4,5,6,23,3,-5,-6,-7,10));
+        String s = rs.summarizeCollection(ll);
+        assertEquals("25, 4-6, 23, 3, -5, -6, -7, 10", s);
+
+        // A TreeSet is naturally sorted, so expect sorted ranges
+        TreeSet<Integer> set = new TreeSet<>(Arrays.asList(25,4,5,6,23,3,-5,-6,-7,10));
+        s = rs.summarizeCollection(set);
+        assertEquals("-7--5, 3-6, 10, 23, 25", s);
+    }
+
+    /**
+     * It should return the empty string when the collecction is null
+     */
+    @Test
+    public void summarizetShouldBeEmpty() {
+      String s = rs.summarizeCollection(null);
+      assertEquals("", s);
+    }
 
 }
