@@ -71,7 +71,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
      * also deemed empty.
      * 
      * @param sb the stringbuilder to check
-     * @return <code> true </code> if the string is deemed empty, false otherwise
+     * @return <code>true</code> if the string is deemed empty, <code>false</code> otherwise
      */
     private boolean stringIsEmpty(StringBuilder sb) {
         return sb.isEmpty() || sb.toString().equals("-");
@@ -89,7 +89,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
      */
     @Override
     public String summarizeCollection(Collection<Integer> input) {
-        String s = "";
+        
         // prev == null denotes the first iteration
         Integer prev = null;
         Integer curr = null;
@@ -98,16 +98,17 @@ public class RangeSummarizer implements NumberRangeSummarizer {
 
         // If the input is null return the empty string
         if (input == null) {
-            return s;
+            return "";
         }
 
+        StringBuilder resultBuilder = new StringBuilder();
         Iterator<Integer> elements = input.iterator();
 
         // Initialise elements, this way 'prev' is guarunteed to
         // not be null in main while loop
         if (elements.hasNext()) {
             curr = elements.next();
-            s += String.valueOf(curr);
+            resultBuilder.append(curr);
             prev = curr;
         }
 
@@ -124,26 +125,26 @@ public class RangeSummarizer implements NumberRangeSummarizer {
             } else {
                 if (isRange) {
                     // Append the end of the previous range
-                    s += "-" + String.valueOf(prev);
+                    resultBuilder.append("-").append(prev);
                     isRange = false;
                     couldBeRange = false;
                 } else if (couldBeRange) {
                     // Append the element that could have been a range but wasn't
-                    s += ", " + String.valueOf(prev);
+                    resultBuilder.append(", ").append(prev);
                     couldBeRange = false;
                 }
-                s += ", " + String.valueOf(curr);
+                resultBuilder.append(", ").append(curr);
             }
             prev = curr;
         }
 
         // If array terminated before range status could be determined, add last range element
         if (isRange) {
-            s += "-" + String.valueOf(curr);
+            resultBuilder.append("-").append(curr);
         } else if (couldBeRange) {
-            s += ", " + String.valueOf(curr);
+            resultBuilder.append(", ").append(curr);
         }
 
-        return s;
+        return resultBuilder.toString();
     }
 }
