@@ -25,7 +25,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseOrderedString() {
         String s = "0,1,2,3,4,5,6";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(7, arr.size());
         for (int i = 0; i < arr.size(); i++) {
             assertEquals(i, arr.get(i));
@@ -38,7 +38,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseEmpty() {
         String s = "";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
     }
 
@@ -48,7 +48,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseNegative() {
         String s = "-4,-3,-2,-1";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(4, arr.size());
         for (int i = 0; i < arr.size(); i++) {
             assertEquals((i - 4), arr.get(i));
@@ -61,7 +61,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseLeadingZero() {
         String s = "-001, 0000, 001,02,003,";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(5, arr.size());
         for (int i = 0; i < arr.size(); i++) {
             assertEquals((i - 1), arr.get(i));
@@ -74,7 +74,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseNonNumeric() {
         String s = "1a,2b,3,al4bet";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(4, arr.size());
         for (int i = 0; i < arr.size(); i++) {
             assertEquals((i + 1), arr.get(i));
@@ -88,7 +88,7 @@ public class RangeSummarizerTest {
     public void parseNegativeSign() {
         String s = "--1,2-,3-4,2-3-4";
         ArrayList<Integer> expected = new ArrayList<>(Arrays.asList(-1, 2, 34, 234));
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(4, arr.size());
         for (int i = 0; i < arr.size(); i++) {
             assertEquals(expected.get(i), arr.get(i));
@@ -101,7 +101,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseOnlyNegative() {
         String s = "-";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
     }
 
@@ -111,7 +111,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseOnlyNumber() {
         String s = "20";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(1, arr.size());
         assertEquals(20, arr.get(0));
     }
@@ -122,7 +122,7 @@ public class RangeSummarizerTest {
     @Test
     public void parseOnlyNegativeNumber() {
         String s = "-20";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(1, arr.size());
         assertEquals(-20, arr.get(0));
     }
@@ -133,15 +133,15 @@ public class RangeSummarizerTest {
     @Test
     public void parseEmptySections() {
         String s = ",";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
 
         s = ",,";
-        arr = (ArrayList<Integer>) rs.collect(s);
+        arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
 
         s = "wait, this is, a sentence, not a sequence";
-        arr = (ArrayList<Integer>) rs.collect(s);
+        arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
     }
 
@@ -152,16 +152,16 @@ public class RangeSummarizerTest {
     @Test
     public void parseUnicode() {
         String s = "\u0021";
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(s);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(0, arr.size());
 
         s = "\u1200,\u0030,";
-        arr = (ArrayList<Integer>) rs.collect(s);
+        arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(1, arr.size());
         assertEquals(0, arr.get(0));
 
         s = "\u4785\u3902,\u0031\u0033";
-        arr = (ArrayList<Integer>) rs.collect(s);
+        arr = new ArrayList<Integer>(rs.collect(s));
         assertEquals(1, arr.size());
         assertEquals(13, arr.get(0));
     }
@@ -171,7 +171,7 @@ public class RangeSummarizerTest {
      */
     @Test
     public void collectNullShouldBeEmpty() {
-        ArrayList<Integer> arr = (ArrayList<Integer>) rs.collect(null);
+        ArrayList<Integer> arr = new ArrayList<Integer>(rs.collect(null));
         assertEquals(0, arr.size());
     }
 
@@ -243,6 +243,17 @@ public class RangeSummarizerTest {
         ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(25, 4, 5, 6, 23, 3, -5, -6, -7, 10));
         String s = rs.summarizeCollection(arr);
         assertEquals("25, 4-6, 23, 3, -5, -6, -7, 10", s);
+    }
+
+    /**
+     * Duplicates are treated as distinct, and should therefore not be summarized if they are
+     * concatenated
+     */
+    @Test
+    public void shouldNotSummarizeDuplicates() {
+        ArrayList<Integer> arr = new ArrayList<>(Arrays.asList(1, 1, 1, 2, 2, 3));
+        String s = rs.summarizeCollection(arr);
+        assertEquals("1, 1, 1, 2, 2, 3", s);
     }
 
     /**
