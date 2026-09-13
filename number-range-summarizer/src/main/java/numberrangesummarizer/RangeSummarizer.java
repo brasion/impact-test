@@ -24,7 +24,7 @@ public class RangeSummarizer implements NumberRangeSummarizer {
      */
     @Override
     public Collection<Integer> collect(String input) {
-        String buffer = "";
+        StringBuilder buffer = new StringBuilder();
         ArrayList<Integer> numberSequence = new ArrayList<>();
 
         // Return empty array if the input is null
@@ -37,20 +37,21 @@ public class RangeSummarizer implements NumberRangeSummarizer {
             switch (ch) {
                 case '-':
                     // Only add a '-' to the integer if it is the first thing encountered
-                    if (buffer.equals("")) {
-                        buffer += ch;
+                    if (buffer.isEmpty()) {
+                        buffer.append(ch);
                     }
                     break;
                 case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-                    buffer += ch;
+                    buffer.append(ch);
                     break;
                 case ',':
                     // Only add the number to the array if it contains some numeric value
                     // This should by construction never be able to throw an error
-                    if (buffer != "" && buffer != "-") {
-                        numberSequence.add(Integer.valueOf(buffer));
+                    if (!stringIsEmpty(buffer)) {
+                        numberSequence.add(Integer.valueOf(buffer.toString()));
                     }
-                    buffer = "";
+                    // Clear the buffer
+                    buffer.setLength(0);
                     break;
                 // Any other character should be ignored
                 default:
@@ -58,10 +59,22 @@ public class RangeSummarizer implements NumberRangeSummarizer {
             }
         }
         // Add last section of buffer to sequence
-        if (!buffer.equals("") && !buffer.equals("-")) {
-            numberSequence.add(Integer.valueOf(buffer));
+        if (!stringIsEmpty(buffer)) {
+            numberSequence.add(Integer.valueOf(buffer.toString()));
         }
         return numberSequence;
+    }
+
+    /**
+     * Checks if the string is empty or if the string
+     * only contains a single '-', in which case it is
+     * also deemed empty.
+     * 
+     * @param sb the stringbuilder to check
+     * @return <code> true </code> if the string is deemed empty, false otherwise
+     */
+    private boolean stringIsEmpty(StringBuilder sb) {
+        return sb.isEmpty() || sb.toString().equals("-");
     }
 
     /**
